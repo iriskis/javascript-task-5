@@ -60,16 +60,15 @@ function getEmitter() {
          */
         emit: function (event) {
             console.info(event);
-            let calledEvents = [event];
-            const multiEvents = event.match(/(\w+)\.\w+/);
-            if (multiEvents) {
-                calledEvents = multiEvents;
-            }
-            calledEvents.forEach(ev => {
-                if (ev in events) {
-                    events[ev].forEach(follower => follower.handler.call(follower.context));
+            const multiEvents = event.split('.');
+            while (multiEvents.length > 0) {
+                let calledEvent = multiEvents.join('.');
+                if (calledEvent in events) {
+                    events[calledEvent].forEach(follower =>
+                        follower.handler.call(follower.context));
                 }
-            });
+                multiEvents.pop();
+            }
 
             return this;
         },
